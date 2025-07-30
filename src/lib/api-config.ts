@@ -1,6 +1,19 @@
 // API Configuration
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+// Temporarily hardcoded - you can change this to your API URL
+export const API_BASE_URL = 'http://localhost:3000';
 export const API_VERSION = '/api/v1';
+
+// Alternative: Dynamic API URL function (use this if you need environment variables)
+export const getApiBaseUrl = (): string => {
+  // For environment variables, create a .env file in your project root with:
+  // VITE_API_BASE_URL=http://your-api-url.com
+  
+  // Uncomment the line below and comment out the hardcoded API_BASE_URL above
+  // if you want to use environment variables:
+  // return import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+  
+  return API_BASE_URL;
+};
 
 // Common API response wrapper
 export interface ApiResponse<T> {
