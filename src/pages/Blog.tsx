@@ -48,15 +48,14 @@ const Blog = () => {
 
   // API hooks
   const { data: blogsResponse, isLoading, error } = useBlogs({
-    type: selectedType || undefined,
-    tags: selectedTags.length > 0 ? selectedTags : undefined,
+    q: selectedType || selectedTags.join(',') || undefined,
   });
   const createBlogMutation = useCreateBlog();
   const deleteBlogMutation = useDeleteBlog();
   const likeBlogMutation = useLikeBlog();
   const unlikeBlogMutation = useUnlikeBlog();
 
-  const blogs = Array.isArray(blogsResponse?.data) ? blogsResponse.data : []
+  const blogs = Array.isArray(blogsResponse?.data?.items) ? blogsResponse.data.items : []
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -72,8 +71,8 @@ const Blog = () => {
       content: content.trim(),
       type,
       tags: tagsArray,
-      thumbnailUrl: thumbnailUrl.trim() || undefined,
-      images: images.length > 0 ? images : undefined,
+      thumbnailUrl: thumbnailUrl.trim() || "https://via.placeholder.com/400x300", // Provide default if empty
+      images: images.length > 0 ? images : [], // Provide empty array instead of undefined
     };
 
     try {
@@ -118,7 +117,7 @@ const Blog = () => {
     }
   };
 
-  const handleDelete = async (blogId: string) => {
+  const handleDelete = async (blogId: number) => {
     if (window.confirm("Bạn có chắc chắn muốn xóa blog này?")) {
       try {
         await deleteBlogMutation.mutateAsync(blogId);

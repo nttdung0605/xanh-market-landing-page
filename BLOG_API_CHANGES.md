@@ -68,15 +68,53 @@ interface PaginatedResponse<T> {
 - Improved error handling to match API error responses
 - Automatic token inclusion in requests when available
 
-### 4. Example Component (`src/components/BlogList.tsx`)
+### 4. Updated React Hooks (`src/hooks/use-blogs.ts`)
+
+**Key Changes:**
+- Updated all ID parameters from `string` to `number`
+- Changed query parameters to match new API specification
+- Updated query keys to use number IDs
+- Fixed mutation function signatures
+
+### 5. Fixed Blog Component (`src/pages/Blog.tsx`)
+
+**Key Changes:**
+- Updated `handleDelete` function to accept `number` instead of `string`
+- Fixed API query parameters to use `q` instead of `type` and `tags`
+- Updated response data access to use `blogsResponse.data.items`
+- Added default values for required fields (`thumbnailUrl` and `images`)
+
+### 6. Example Component (`src/components/BlogList.tsx`)
 
 **Features:**
 - Complete blog listing with pagination
 - Search functionality
 - Like/unlike functionality
-- Loading states and error handling
-- Responsive design with Tailwind CSS
+- Loading states and comprehensive error handling
+- Responsive design using Tailwind CSS
 - Empty state handling
+
+### 7. Comprehensive Documentation (`BLOG_API_CHANGES.md`)
+
+- Detailed explanation of all changes made
+- Usage examples for all API methods
+- Authentication setup instructions
+- Error handling guidelines
+- Testing instructions
+
+## 🔧 Key API Endpoints Integrated
+
+- `GET /api/v1/blogs` - Get all blogs with pagination and search
+- `POST /api/v1/blogs` - Create a new blog
+- `GET /api/v1/blogs/{id}` - Get blog details
+- `PATCH /api/v1/blogs/{id}` - Update a blog
+- `DELETE /api/v1/blogs/{id}` - Delete a blog
+- `POST /api/v1/blogs/{id}/like` - Like a blog
+- `DELETE /api/v1/blogs/{id}/unlike` - Unlike a blog
+- `GET /api/v1/blogs/{id}/comments` - Get blog comments
+- `POST /api/v1/blogs/{id}/comment` - Create a comment
+- `PATCH /api/v1/blogs/{id}/comment/{commentId}` - Update a comment
+- `DELETE /api/v1/blogs/{id}/comment/{commentId}` - Delete a comment
 
 ## Usage Examples
 
@@ -215,3 +253,61 @@ VITE_API_BASE_URL=https://xanhmarket-api.hpcc.vn
 ```
 
 If not set, it defaults to `https://xanhmarket-api.hpcc.vn`.
+
+## Troubleshooting
+
+### TypeScript Errors
+
+If you encounter TypeScript errors related to ID types:
+
+1. **"Argument of type 'number' is not assignable to parameter of type 'string'"**
+   - This error occurs when old code is still using string IDs
+   - Update all ID parameters to use `number` type
+   - Check hooks, components, and service calls
+
+2. **Response structure errors**
+   - Make sure to access response data as `response.data.items` for paginated responses
+   - Use `response.data` for single item responses
+
+### API Response Issues
+
+1. **Empty response or undefined data**
+   - Check if authentication token is set properly
+   - Verify the API endpoint is accessible
+   - Check network connectivity
+
+2. **Pagination not working**
+   - Ensure you're accessing `response.data.items` for the array of items
+   - Use `response.data.meta` for pagination metadata
+
+### Common Fixes Applied
+
+1. **Updated Blog.tsx**:
+   - Changed `handleDelete` parameter from `string` to `number`
+   - Fixed query parameters to use `q` instead of `type` and `tags`
+   - Updated response data access pattern
+   - Added default values for required fields
+
+2. **Updated use-blogs.ts**:
+   - Changed all ID types from `string` to `number`
+   - Updated query parameters structure
+   - Fixed mutation signatures
+
+3. **Updated types**:
+   - Made `thumbnailUrl` and `images` required in create requests
+   - Updated response structure to match actual API format
+
+## 🚀 Ready to Use
+
+The blog API integration is now fully updated and ready to use with the XanhMarket API. The code includes:
+
+- ✅ Proper TypeScript types matching the API specification
+- ✅ Bearer token authentication support
+- ✅ Complete CRUD operations for blogs and comments
+- ✅ Pagination and search functionality
+- ✅ Error handling and loading states
+- ✅ Example React component
+- ✅ Comprehensive documentation
+- ✅ Fixed TypeScript compilation errors
+
+You can now use the updated `blogService` to interact with the XanhMarket API, and the `BlogList` component as a reference for implementing blog functionality in your application.
