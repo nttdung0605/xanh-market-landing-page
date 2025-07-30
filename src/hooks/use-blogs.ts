@@ -15,16 +15,15 @@ export const blogKeys = {
   lists: () => [...blogKeys.all, 'list'] as const,
   list: (filters: any) => [...blogKeys.lists(), { filters }] as const,
   details: () => [...blogKeys.all, 'detail'] as const,
-  detail: (id: string) => [...blogKeys.details(), id] as const,
-  comments: (blogId: string) => [...blogKeys.all, 'comments', blogId] as const,
+  detail: (id: number) => [...blogKeys.details(), id] as const,
+  comments: (blogId: number) => [...blogKeys.all, 'comments', blogId] as const,
 };
 
 // Blog queries
 export const useBlogs = (params?: {
   page?: number;
   limit?: number;
-  type?: string;
-  tags?: string[];
+  q?: string; // Updated to match API spec
 }) => {
   return useQuery({
     queryKey: blogKeys.list(params),
@@ -33,7 +32,7 @@ export const useBlogs = (params?: {
   });
 };
 
-export const useBlog = (id: string) => {
+export const useBlog = (id: number) => {
   return useQuery({
     queryKey: blogKeys.detail(id),
     queryFn: () => blogService.getBlogById(id),
@@ -41,7 +40,7 @@ export const useBlog = (id: string) => {
   });
 };
 
-export const useBlogComments = (blogId: string, params?: {
+export const useBlogComments = (blogId: number, params?: {
   page?: number;
   limit?: number;
 }) => {
@@ -81,7 +80,7 @@ export const useUpdateBlog = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: ({ id, data }: { id: string; data: UpdateBlogRequest }) =>
+    mutationFn: ({ id, data }: { id: number; data: UpdateBlogRequest }) =>
       blogService.updateBlog(id, data),
     onSuccess: (_, { id }) => {
       queryClient.invalidateQueries({ queryKey: blogKeys.lists() });
@@ -106,7 +105,7 @@ export const useDeleteBlog = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: (id: string) => blogService.deleteBlog(id),
+    mutationFn: (id: number) => blogService.deleteBlog(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: blogKeys.lists() });
       toast({
@@ -129,7 +128,7 @@ export const useLikeBlog = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => blogService.likeBlog(id),
+    mutationFn: (id: number) => blogService.likeBlog(id),
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: blogKeys.lists() });
       queryClient.invalidateQueries({ queryKey: blogKeys.detail(id) });
@@ -141,7 +140,7 @@ export const useUnlikeBlog = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => blogService.unlikeBlog(id),
+    mutationFn: (id: number) => blogService.unlikeBlog(id),
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: blogKeys.lists() });
       queryClient.invalidateQueries({ queryKey: blogKeys.detail(id) });
@@ -155,7 +154,7 @@ export const useCreateComment = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: ({ blogId, data }: { blogId: string; data: CreateCommentRequest }) =>
+    mutationFn: ({ blogId, data }: { blogId: number; data: CreateCommentRequest }) =>
       blogService.comments.createComment(blogId, data),
     onSuccess: (_, { blogId }) => {
       queryClient.invalidateQueries({ queryKey: blogKeys.comments(blogId) });
@@ -185,8 +184,8 @@ export const useUpdateComment = () => {
       commentId, 
       data 
     }: { 
-      blogId: string; 
-      commentId: string; 
+      blogId: number; 
+      commentId: number; 
       data: UpdateCommentRequest 
     }) => blogService.comments.updateComment(blogId, commentId, data),
     onSuccess: (_, { blogId }) => {
@@ -211,9 +210,10 @@ export const useDeleteComment = () => {
   const { toast } = useToast();
 
   return useMutation({
-    mutationFn: ({ blogId, commentId }: { blogId: string; commentId: string }) =>
+    mutationFn: ({ blogId, commentId }: { blogId: number; commentId: number }) =>
       blogService.comments.deleteComment(blogId, commentId),
     onSuccess: (_, { blogId }) => {
+      queryClient.invalidateQueries({ queryKey: blogKeys.comments(blogId) });
       queryClient.invalidateQueries({ queryKey: blogKeys.comments(blogId) });
       queryClient.invalidateQueries({ queryKey: blogKeys.detail(blogId) });
       toast({

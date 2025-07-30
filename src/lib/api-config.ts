@@ -16,6 +16,17 @@ export interface ApiError {
   error?: string;
 }
 
+// Auth token management
+let authToken: string | null = null;
+
+export const setAuthToken = (token: string | null) => {
+  authToken = token;
+};
+
+export const getAuthToken = (): string | null => {
+  return authToken || localStorage.getItem('auth_token');
+};
+
 // Common fetch wrapper with error handling
 export async function apiRequest<T>(
   endpoint: string,
@@ -23,9 +34,16 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const url = `${API_BASE_URL}${API_VERSION}${endpoint}`;
   
-  const defaultHeaders = {
+  const token = getAuthToken();
+  const defaultHeaders: Record<string, string> = {
     'Content-Type': 'application/json',
   };
+
+  // Add bearer token if available (as per OpenAPI spec)
+  if (token) {
+    defaultHeaders['Authorization'] = `Bearer ${token}`;
+  }
+
 
   const config: RequestInit = {
     ...options,
