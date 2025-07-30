@@ -89,7 +89,7 @@ VITE_API_BASE_URL=http://localhost:3000
 
 The API configuration is handled in `src/lib/api-config.ts`:
 
-- **Base URL**: Configurable via `VITE_API_BASE_URL` environment variable
+- **Base URL**: Configurable via `VITE_API_BASE_URL` environment variable (uses `import.meta.env` for Vite)
 - **API Version**: `/api/v1`
 - **Error Handling**: Centralized error handling with proper error messages
 - **Content Type**: Automatic JSON content type headers
@@ -270,6 +270,7 @@ curl -X POST "http://localhost:3000/api/v1/blogs" \
 2. **404 Errors**: Verify API endpoints match the expected URLs
 3. **Network Errors**: Check that the backend server is running
 4. **TypeScript Errors**: Ensure all interfaces match your API response format
+5. **Environment Variable Errors**: Make sure to use `VITE_` prefix for environment variables in Vite projects
 
 ### Debug Mode
 
