@@ -23,12 +23,43 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useBlogs, useCreateBlog, useDeleteBlog, useLikeBlog, useUnlikeBlog } from "@/hooks/use-blogs";
 import { BlogPost, CreateBlogRequest, BlogImage } from "@/types/blog";
+import { API_BASE_URL } from "@/lib/api-config";
 
 const BLOG_TYPES = [
   { value: "experience", label: "Kinh nghiệm" },
   { value: "tutorial", label: "Hướng dẫn" },
   { value: "news", label: "Tin tức" },
   { value: "review", label: "Đánh giá" },
+];
+
+// Mock data for development when API is not available
+const MOCK_BLOGS: BlogPost[] = [
+  {
+    id: "1",
+    title: "Khởi đầu hành trình thực phẩm sạch",
+    content: "Tại Xanh Market, chúng tôi tin rằng thực phẩm sạch không chỉ là xu hướng mà là nhu cầu thiết yếu cho sức khỏe cộng đồng. Hành trình của chúng tôi bắt đầu từ mong muốn mang đến những sản phẩm thực phẩm an toàn, có nguồn gốc rõ ràng...",
+    tags: ["thực-phẩm-sạch", "sức-khỏe", "an-toàn"],
+    type: "experience",
+    author: "Nguyễn Văn A",
+    createdAt: "2024-01-15",
+    likesCount: 15,
+    commentsCount: 8,
+    isLiked: false,
+    thumbnailUrl: "https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&h=300&fit=crop"
+  },
+  {
+    id: "2", 
+    title: "Công nghệ truy xuất nguồn gốc thực phẩm",
+    content: "Với sự phát triển của công nghệ blockchain, việc truy xuất nguồn gốc thực phẩm đã trở nên minh bạch và đáng tin cậy hơn bao giờ hết. Mỗi sản phẩm tại Xanh Market đều được gắn mã QR để khách hàng có thể kiểm tra...",
+    tags: ["công-nghệ", "blockchain", "truy-xuất"],
+    type: "tutorial",
+    author: "Trần Thị B",
+    createdAt: "2024-01-10",
+    likesCount: 23,
+    commentsCount: 12,
+    isLiked: true,
+    thumbnailUrl: "https://images.unsplash.com/photo-1518796745738-41048802f99a?w=500&h=300&fit=crop"
+  }
 ];
 
 const Blog = () => {
@@ -56,7 +87,21 @@ const Blog = () => {
   const likeBlogMutation = useLikeBlog();
   const unlikeBlogMutation = useUnlikeBlog();
 
-  const blogs = blogsResponse?.data || [];
+  // Use mock data if API fails or returns invalid data
+  const blogs = Array.isArray(blogsResponse?.data) 
+    ? blogsResponse.data 
+    : error 
+    ? MOCK_BLOGS 
+    : [];
+
+  // Debug logging (remove in production)
+  if (blogsResponse && !Array.isArray(blogsResponse.data)) {
+    console.warn('API response data is not an array:', blogsResponse);
+  }
+  
+  if (error) {
+    console.warn('API error, using mock data:', error.message);
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -136,27 +181,38 @@ const Blog = () => {
     }
   };
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-8">
-          <div className="text-center py-16">
-            <p className="text-destructive text-lg">
-              Có lỗi xảy ra khi tải dữ liệu: {error.message}
-            </p>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
+  // Show error banner but continue with mock data
+  const showErrorBanner = error && blogs.length === 0;
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
       <main className="container mx-auto px-4 py-8">
+        {/* Error Banner */}
+        {error && (
+          <div className="mb-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-yellow-800 font-medium">
+                  Không thể kết nối tới API backend
+                </p>
+                <p className="text-yellow-700 text-sm mt-1">
+                  Đang hiển thị dữ liệu mẫu. API: {API_BASE_URL}
+                </p>
+              </div>
+              <Button 
+                onClick={() => window.location.reload()} 
+                size="sm"
+                variant="outline"
+                className="border-yellow-300 text-yellow-800 hover:bg-yellow-100"
+              >
+                Thử lại
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/* Header Section */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-foreground mb-4">
@@ -204,6 +260,8 @@ const Blog = () => {
           <Button 
             onClick={() => setIsWriting(!isWriting)}
             className="bg-gradient-primary text-white"
+            disabled={!!error}
+            title={error ? "Cần kết nối API để tạo blog mới" : ""}
           >
             <PlusCircle className="w-4 h-4 mr-2" />
             {isWriting ? "Hủy" : "Viết Blog"}
@@ -374,6 +432,8 @@ const Blog = () => {
                       size="sm"
                       onClick={() => handleDelete(blog.id)}
                       className="text-destructive hover:text-destructive"
+                      disabled={!!error}
+                      title={error ? "Cần kết nối API để xóa blog" : ""}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -430,6 +490,8 @@ const Blog = () => {
                         size="sm"
                         onClick={() => handleLike(blog)}
                         className={blog.isLiked ? "text-red-500" : ""}
+                        disabled={!!error}
+                        title={error ? "Cần kết nối API để thích blog" : ""}
                       >
                         <Heart className={`w-4 h-4 mr-1 ${blog.isLiked ? "fill-current" : ""}`} />
                         {blog.likesCount || 0}
@@ -547,6 +609,8 @@ const Blog = () => {
                   variant="ghost"
                   onClick={() => handleLike(selectedBlog)}
                   className={selectedBlog.isLiked ? "text-red-500" : ""}
+                  disabled={!!error}
+                  title={error ? "Cần kết nối API để thích blog" : ""}
                 >
                   <Heart className={`w-4 h-4 mr-2 ${selectedBlog.isLiked ? "fill-current" : ""}`} />
                   {selectedBlog.isLiked ? "Đã thích" : "Thích"} ({selectedBlog.likesCount || 0})
