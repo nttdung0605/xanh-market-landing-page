@@ -21,6 +21,8 @@ import {
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import TestMock from "@/components/TestMock";
+import SimpleTest from "@/components/SimpleTest";
 import { useBlogs, useCreateBlog, useDeleteBlog, useLikeBlog, useUnlikeBlog } from "@/hooks/use-blogs";
 import { BlogPost, CreateBlogRequest, BlogImage } from "@/types/blog";
 
@@ -55,7 +57,26 @@ const Blog = () => {
   const likeBlogMutation = useLikeBlog();
   const unlikeBlogMutation = useUnlikeBlog();
 
-  const blogs = Array.isArray(blogsResponse?.data?.items) ? blogsResponse.data.items : []
+  const blogs = blogsResponse?.data?.items || []
+  
+  // Debug the data structure
+  console.log('blogsResponse structure:', {
+    blogsResponse,
+    hasData: !!blogsResponse?.data,
+    hasItems: !!blogsResponse?.data?.items,
+    itemsLength: blogsResponse?.data?.items?.length,
+    itemsType: typeof blogsResponse?.data?.items,
+    isArray: Array.isArray(blogsResponse?.data?.items)
+  });
+  
+  // Debug logging
+  console.log('Blog component render:', {
+    blogsResponse,
+    isLoading,
+    error,
+    blogs,
+    blogsLength: blogs.length
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -347,6 +368,21 @@ const Blog = () => {
             <p className="text-muted-foreground text-lg">Đang tải...</p>
           </div>
         )}
+
+        {/* Debug info */}
+        <div className="mb-4 p-4 bg-gray-100 rounded">
+          <p>Debug Info:</p>
+          <p>Loading: {isLoading ? 'Yes' : 'No'}</p>
+          <p>Error: {error ? error.message : 'None'}</p>
+          <p>Blogs count: {blogs.length}</p>
+          <p>Response: {JSON.stringify(blogsResponse, null, 2)}</p>
+        </div>
+
+        {/* Test Mock Service */}
+        <TestMock />
+        
+        {/* Simple React Query Test */}
+        <SimpleTest />
 
         {/* Blog Posts Grid */}
         {!isLoading && (

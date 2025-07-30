@@ -68,6 +68,7 @@ export const mockBlogService = {
     limit?: number;
     q?: string;
   }) => {
+    console.log('Mock blog service getBlogs called with params:', params);
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 500));
     

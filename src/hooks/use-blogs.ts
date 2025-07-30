@@ -13,7 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 export const blogKeys = {
   all: ['blogs'] as const,
   lists: () => [...blogKeys.all, 'list'] as const,
-  list: (filters: any) => [...blogKeys.lists(), { filters }] as const,
+  list: (filters: any) => [...blogKeys.lists(), filters] as const,
   details: () => [...blogKeys.all, 'detail'] as const,
   detail: (id: number) => [...blogKeys.details(), id] as const,
   comments: (blogId: number) => [...blogKeys.all, 'comments', blogId] as const,
@@ -25,9 +25,15 @@ export const useBlogs = (params?: {
   limit?: number;
   q?: string; // Updated to match API spec
 }) => {
+  console.log('useBlogs hook called with params:', params);
   return useQuery({
-    queryKey: blogKeys.list(params),
-    queryFn: () => blogService.getBlogs(params),
+    queryKey: ['blogs', 'list', params],
+    queryFn: async () => {
+      console.log('useBlogs queryFn called');
+      const result = await blogService.getBlogs(params);
+      console.log('useBlogs queryFn result:', result);
+      return result;
+    },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };

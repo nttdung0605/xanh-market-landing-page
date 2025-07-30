@@ -22,34 +22,16 @@ export const blogApi = {
     limit?: number;
     q?: string; // Search keyword as per API spec
   }): Promise<BlogsResponse> => {
-    // Use mock service for testing when API is not available
-    try {
-      const searchParams = new URLSearchParams();
-      
-      if (params?.page) searchParams.append('page', params.page.toString());
-      if (params?.limit) searchParams.append('limit', params.limit.toString());
-      if (params?.q) searchParams.append('q', params.q);
-
-      const queryString = searchParams.toString();
-      const endpoint = `/blogs${queryString ? `?${queryString}` : ''}`;
-      
-      return api.get<BlogsResponse>(endpoint);
-    } catch (error) {
-      // Fallback to mock service if API fails
-      console.log('Using mock blog service for testing');
-      return mockBlogService.getBlogs(params);
-    }
+    // Force use mock service for testing
+    console.log('Using mock blog service for testing');
+    return mockBlogService.getBlogs(params);
   },
 
   // Create a new blog - matches POST /api/v1/blogs
   createBlog: async (data: CreateBlogRequest): Promise<BlogResponse> => {
-    try {
-      return api.post<BlogResponse>('/blogs', data);
-    } catch (error) {
-      // Fallback to mock service if API fails
-      console.log('Using mock blog service for testing');
-      return mockBlogService.createBlog(data);
-    }
+    // Force use mock service for testing
+    console.log('Using mock blog service for testing');
+    return mockBlogService.createBlog(data);
   },
 
   // Get blog by ID - matches GET /api/v1/blogs/{id}
@@ -70,24 +52,16 @@ export const blogApi = {
 
   // Like a blog - matches POST /api/v1/blogs/{id}/like
   likeBlog: async (id: number): Promise<LikeResponse> => {
-    try {
-      return api.post<LikeResponse>(`/blogs/${id}/like`);
-    } catch (error) {
-      // Fallback to mock service if API fails
-      console.log('Using mock blog service for testing');
-      return mockBlogService.likeBlog(id);
-    }
+    // Force use mock service for testing
+    console.log('Using mock blog service for testing');
+    return mockBlogService.likeBlog(id);
   },
 
   // Unlike a blog - matches DELETE /api/v1/blogs/{id}/unlike
   unlikeBlog: async (id: number): Promise<LikeResponse> => {
-    try {
-      return api.delete<LikeResponse>(`/blogs/${id}/unlike`);
-    } catch (error) {
-      // Fallback to mock service if API fails
-      console.log('Using mock blog service for testing');
-      return mockBlogService.unlikeBlog(id);
-    }
+    // Force use mock service for testing
+    console.log('Using mock blog service for testing');
+    return mockBlogService.unlikeBlog(id);
   },
 };
 
