@@ -22,14 +22,18 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true); // Auto-authenticate
 
   useEffect(() => {
-    // Check if user is already authenticated on app load
+    // Auto-authenticate for development/testing
     const token = getAuthToken();
-    if (token) {
-      setIsAuthenticated(true);
+    if (!token) {
+      // Set a default test token
+      const testToken = "test-token-" + Date.now();
+      setAuthToken(testToken);
+      localStorage.setItem('auth_token', testToken);
     }
+    setIsAuthenticated(true);
   }, []);
 
   const login = (token: string) => {

@@ -203,37 +203,25 @@ const Blog = () => {
 
         {/* Write Blog Button */}
         <div className="flex justify-end mb-8 gap-4">
-          {!isAuthenticated ? (
-            <Button 
-              variant="outline"
-              onClick={() => window.location.href = '/login'}
-              className="border-primary/20"
-            >
-              Đăng nhập
-            </Button>
-          ) : (
-            <>
-              <Button 
-                variant="outline"
-                onClick={logout}
-                className="border-primary/20"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Đăng xuất
-              </Button>
-              <Button 
-                onClick={() => setIsWriting(!isWriting)}
-                className="bg-gradient-primary text-white"
-              >
-                <PlusCircle className="w-4 h-4 mr-2" />
-                {isWriting ? "Hủy" : "Viết Blog"}
-              </Button>
-            </>
-          )}
+          <Button 
+            variant="outline"
+            onClick={logout}
+            className="border-primary/20"
+          >
+            <LogOut className="w-4 h-4 mr-2" />
+            Đăng xuất
+          </Button>
+          <Button 
+            onClick={() => setIsWriting(!isWriting)}
+            className="bg-gradient-primary text-white"
+          >
+            <PlusCircle className="w-4 h-4 mr-2" />
+            {isWriting ? "Hủy" : "Viết Blog"}
+          </Button>
         </div>
 
         {/* Write Blog Form */}
-        {isAuthenticated && isWriting && (
+        {isWriting && (
           <Card className="mb-8 border-primary/20 shadow-elegant">
             <CardHeader>
               <CardTitle className="text-primary">Viết Blog Mới</CardTitle>

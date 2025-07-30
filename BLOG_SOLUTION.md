@@ -13,9 +13,9 @@ The reason you don't see any blogs on the blog page is because:
 I've implemented a comprehensive solution that includes:
 
 ### 1. Authentication System
-- **Login Page** (`/login`) - Allows users to authenticate
+- **Auto-Authentication** - Automatically authenticated for development
 - **Auth Context** - Manages authentication state across the app
-- **Test Login Button** - Temporary solution for testing without real API authentication
+- **Bypassed Login** - No login required for testing
 
 ### 2. Mock Blog Service
 - **Sample Blogs** - 3 pre-created blogs for testing
@@ -37,16 +37,14 @@ I've implemented a comprehensive solution that includes:
 
 2. **Navigate to the blog page** (`/blog`)
 
-3. **Click "Đăng nhập"** to go to the login page
-
-4. **Click "🧪 Test Login (Tạm thời)"** to use the test authentication
-
-5. **You should now see 3 sample blogs** and be able to:
+3. **You should immediately see 3 sample blogs** and be able to:
    - View blogs with images and content
    - Like/unlike blogs
-   - Create new blogs (when authenticated)
-   - Delete blogs (when authenticated)
+   - Create new blogs (automatically authenticated)
+   - Delete blogs (automatically authenticated)
    - Search and filter blogs
+
+**Note**: Login is bypassed for development - you're automatically authenticated!
 
 ## Sample Blogs Included
 
