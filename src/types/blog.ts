@@ -1,17 +1,17 @@
-// Blog interfaces based on the API schema
+// Blog interfaces based on the actual API schema from OpenAPI spec
 export interface BlogImage {
   imageUrl: string;
   index: number;
 }
 
 export interface BlogPost {
-  id: string;
+  id: number; // Changed from string to number to match API
   title: string;
   content: string;
   tags: string[];
   type: string;
-  thumbnailUrl?: string;
-  images?: BlogImage[];
+  thumbnailUrl: string; // Made required as per API spec
+  images: BlogImage[]; // Made required as per API spec
   author?: string;
   createdAt?: string;
   updatedAt?: string;
@@ -21,20 +21,21 @@ export interface BlogPost {
 }
 
 export interface BlogComment {
-  id: string;
+  id: number; // Changed from string to number to match API
   content: string;
-  author: string;
-  createdAt: string;
+  author?: string; // Made optional as it might not always be present
+  createdAt?: string; // Made optional
   updatedAt?: string;
 }
 
+// Request DTOs matching the API specification
 export interface CreateBlogRequest {
   title: string;
   content: string;
   tags: string[];
   type: string;
-  thumbnailUrl?: string;
-  images?: BlogImage[];
+  thumbnailUrl: string; // Required as per API spec
+  images: BlogImage[]; // Required as per API spec
 }
 
 export interface UpdateBlogRequest {
@@ -48,37 +49,51 @@ export interface UpdateBlogRequest {
 
 export interface CreateCommentRequest {
   content: string;
-  author?: string;
 }
 
 export interface UpdateCommentRequest {
   content: string;
 }
 
-// Response types
-export interface BlogsResponse {
-  data: BlogPost[];
-  total?: number;
-  page?: number;
-  limit?: number;
+// API response meta structure based on actual API response
+export interface ApiMeta {
+  statusCode: number;
+  message: string;
+  error: string;
 }
 
-export interface BlogResponse {
-  data: BlogPost;
+export interface PaginationMeta {
+  page: number;
+  limit: number;
+  itemCount: number;
+  pageCount: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
 }
 
-export interface CommentsResponse {
-  data: BlogComment[];
-  total?: number;
+// Response wrapper structure matching actual API
+export interface ApiResponse<T> {
+  meta: ApiMeta;
+  data: T;
 }
 
-export interface CommentResponse {
-  data: BlogComment;
+export interface PaginatedData<T> {
+  items: T[];
+  meta: PaginationMeta;
 }
 
-export interface LikeResponse {
-  data: {
-    isLiked: boolean;
-    likesCount: number;
-  };
-}
+export interface PaginatedResponse<T> extends ApiResponse<PaginatedData<T>> {}
+
+// Specific response types
+export interface BlogsResponse extends PaginatedResponse<BlogPost> {}
+
+export interface BlogResponse extends ApiResponse<BlogPost> {}
+
+export interface CommentsResponse extends PaginatedResponse<BlogComment> {}
+
+export interface CommentResponse extends ApiResponse<BlogComment> {}
+
+export interface LikeResponse extends ApiResponse<{
+  isLiked: boolean;
+  likesCount: number;
+}> {}

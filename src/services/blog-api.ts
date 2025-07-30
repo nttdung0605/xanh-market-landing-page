@@ -15,21 +15,17 @@ import {
 
 // Blog CRUD operations
 export const blogApi = {
-  // Get all blogs
+  // Get all blogs - matches GET /api/v1/blogs
   getBlogs: async (params?: {
     page?: number;
     limit?: number;
-    type?: string;
-    tags?: string[];
+    q?: string; // Search keyword as per API spec
   }): Promise<BlogsResponse> => {
     const searchParams = new URLSearchParams();
     
     if (params?.page) searchParams.append('page', params.page.toString());
     if (params?.limit) searchParams.append('limit', params.limit.toString());
-    if (params?.type) searchParams.append('type', params.type);
-    if (params?.tags?.length) {
-      params.tags.forEach(tag => searchParams.append('tags', tag));
-    }
+    if (params?.q) searchParams.append('q', params.q);
 
     const queryString = searchParams.toString();
     const endpoint = `/blogs${queryString ? `?${queryString}` : ''}`;
@@ -37,41 +33,41 @@ export const blogApi = {
     return api.get<BlogsResponse>(endpoint);
   },
 
-  // Create a new blog
+  // Create a new blog - matches POST /api/v1/blogs
   createBlog: async (data: CreateBlogRequest): Promise<BlogResponse> => {
     return api.post<BlogResponse>('/blogs', data);
   },
 
-  // Get blog by ID
-  getBlogById: async (id: string): Promise<BlogResponse> => {
+  // Get blog by ID - matches GET /api/v1/blogs/{id}
+  getBlogById: async (id: number): Promise<BlogResponse> => {
     return api.get<BlogResponse>(`/blogs/${id}`);
   },
 
-  // Update blog
-  updateBlog: async (id: string, data: UpdateBlogRequest): Promise<BlogResponse> => {
+  // Update blog - matches PATCH /api/v1/blogs/{id}
+  updateBlog: async (id: number, data: UpdateBlogRequest): Promise<BlogResponse> => {
     return api.patch<BlogResponse>(`/blogs/${id}`, data);
   },
 
-  // Delete blog
-  deleteBlog: async (id: string): Promise<void> => {
+  // Delete blog - matches DELETE /api/v1/blogs/{id}
+  deleteBlog: async (id: number): Promise<void> => {
     return api.delete<void>(`/blogs/${id}`);
   },
 
-  // Like a blog
-  likeBlog: async (id: string): Promise<LikeResponse> => {
+  // Like a blog - matches POST /api/v1/blogs/{id}/like
+  likeBlog: async (id: number): Promise<LikeResponse> => {
     return api.post<LikeResponse>(`/blogs/${id}/like`);
   },
 
-  // Unlike a blog
-  unlikeBlog: async (id: string): Promise<LikeResponse> => {
+  // Unlike a blog - matches DELETE /api/v1/blogs/{id}/unlike
+  unlikeBlog: async (id: number): Promise<LikeResponse> => {
     return api.delete<LikeResponse>(`/blogs/${id}/unlike`);
   },
 };
 
 // Comment operations
 export const commentApi = {
-  // Get comments for a blog
-  getComments: async (blogId: string, params?: {
+  // Get comments for a blog - matches GET /api/v1/blogs/{id}/comments
+  getComments: async (blogId: number, params?: {
     page?: number;
     limit?: number;
   }): Promise<CommentsResponse> => {
@@ -86,22 +82,22 @@ export const commentApi = {
     return api.get<CommentsResponse>(endpoint);
   },
 
-  // Create a comment
-  createComment: async (blogId: string, data: CreateCommentRequest): Promise<CommentResponse> => {
+  // Create a comment - matches POST /api/v1/blogs/{id}/comment
+  createComment: async (blogId: number, data: CreateCommentRequest): Promise<CommentResponse> => {
     return api.post<CommentResponse>(`/blogs/${blogId}/comment`, data);
   },
 
-  // Update a comment
+  // Update a comment - matches PATCH /api/v1/blogs/{id}/comment/{commentId}
   updateComment: async (
-    blogId: string,
-    commentId: string,
+    blogId: number,
+    commentId: number,
     data: UpdateCommentRequest
   ): Promise<CommentResponse> => {
     return api.patch<CommentResponse>(`/blogs/${blogId}/comment/${commentId}`, data);
   },
 
-  // Delete a comment
-  deleteComment: async (blogId: string, commentId: string): Promise<void> => {
+  // Delete a comment - matches DELETE /api/v1/blogs/{id}/comment/{commentId}
+  deleteComment: async (blogId: number, commentId: number): Promise<void> => {
     return api.delete<void>(`/blogs/${blogId}/comment/${commentId}`);
   },
 };
