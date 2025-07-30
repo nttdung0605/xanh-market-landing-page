@@ -17,10 +17,12 @@ import {
   Image as ImageIcon,
   Trash2,
   Edit,
-  Send
+  Send,
+  LogOut
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/contexts/AuthContext";
 import { useBlogs, useCreateBlog, useDeleteBlog, useLikeBlog, useUnlikeBlog } from "@/hooks/use-blogs";
 import { BlogPost, CreateBlogRequest, BlogImage } from "@/types/blog";
 
@@ -36,6 +38,7 @@ const Blog = () => {
   const [selectedBlog, setSelectedBlog] = useState<BlogPost | null>(null);
   const [selectedType, setSelectedType] = useState<string>("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const { isAuthenticated, logout } = useAuth();
   
   // Form states
   const [title, setTitle] = useState("");
@@ -199,18 +202,38 @@ const Blog = () => {
         </div>
 
         {/* Write Blog Button */}
-        <div className="flex justify-end mb-8">
-          <Button 
-            onClick={() => setIsWriting(!isWriting)}
-            className="bg-gradient-primary text-white"
-          >
-            <PlusCircle className="w-4 h-4 mr-2" />
-            {isWriting ? "Hủy" : "Viết Blog"}
-          </Button>
+        <div className="flex justify-end mb-8 gap-4">
+          {!isAuthenticated ? (
+            <Button 
+              variant="outline"
+              onClick={() => window.location.href = '/login'}
+              className="border-primary/20"
+            >
+              Đăng nhập
+            </Button>
+          ) : (
+            <>
+              <Button 
+                variant="outline"
+                onClick={logout}
+                className="border-primary/20"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Đăng xuất
+              </Button>
+              <Button 
+                onClick={() => setIsWriting(!isWriting)}
+                className="bg-gradient-primary text-white"
+              >
+                <PlusCircle className="w-4 h-4 mr-2" />
+                {isWriting ? "Hủy" : "Viết Blog"}
+              </Button>
+            </>
+          )}
         </div>
 
         {/* Write Blog Form */}
-        {isWriting && (
+        {isAuthenticated && isWriting && (
           <Card className="mb-8 border-primary/20 shadow-elegant">
             <CardHeader>
               <CardTitle className="text-primary">Viết Blog Mới</CardTitle>
