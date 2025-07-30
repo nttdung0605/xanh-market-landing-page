@@ -34,7 +34,7 @@ const BLOG_TYPES = [
 const Blog = () => {
   const [isWriting, setIsWriting] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState<BlogPost | null>(null);
-  const [selectedType, setSelectedType] = useState<string>("");
+  const [selectedType, setSelectedType] = useState<string>("all");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   
   // Form states
@@ -48,7 +48,7 @@ const Blog = () => {
 
   // API hooks
   const { data: blogsResponse, isLoading, error } = useBlogs({
-    type: selectedType || undefined,
+    type: selectedType && selectedType !== "all" ? selectedType : undefined,
     tags: selectedTags.length > 0 ? selectedTags : undefined,
   });
   const createBlogMutation = useCreateBlog();
@@ -174,7 +174,7 @@ const Blog = () => {
               <SelectValue placeholder="Lọc theo loại" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Tất cả loại</SelectItem>
+              <SelectItem value="all">Tất cả loại</SelectItem>
               {BLOG_TYPES.map((blogType) => (
                 <SelectItem key={blogType.value} value={blogType.value}>
                   {blogType.label}
@@ -458,7 +458,7 @@ const Blog = () => {
         {!isLoading && blogs.length === 0 && (
           <div className="text-center py-16">
             <p className="text-muted-foreground text-lg">
-              {selectedType || selectedTags.length > 0 
+              {(selectedType && selectedType !== "all") || selectedTags.length > 0 
                 ? "Không tìm thấy blog nào phù hợp với bộ lọc." 
                 : "Chưa có blog nào. Hãy là người đầu tiên viết blog!"
               }
