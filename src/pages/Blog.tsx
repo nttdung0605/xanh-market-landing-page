@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { 
   PlusCircle, 
   Calendar, 
@@ -17,11 +18,15 @@ import {
   Image as ImageIcon,
   Trash2,
   Edit,
-  Send
+  Send,
+  LogIn,
+  LogOut
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useBlogs, useCreateBlog, useDeleteBlog, useLikeBlog, useUnlikeBlog } from "@/hooks/use-blogs";
+import { useAuth } from "@/hooks/use-auth";
+import { LoginDialog } from "@/components/LoginDialog";
 import { BlogPost, CreateBlogRequest, BlogImage } from "@/types/blog";
 
 const BLOG_TYPES = [
@@ -36,6 +41,7 @@ const Blog = () => {
   const [selectedBlog, setSelectedBlog] = useState<BlogPost | null>(null);
   const [selectedType, setSelectedType] = useState<string>("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
   
   // Form states
   const [title, setTitle] = useState("");
@@ -54,6 +60,9 @@ const Blog = () => {
   const deleteBlogMutation = useDeleteBlog();
   const likeBlogMutation = useLikeBlog();
   const unlikeBlogMutation = useUnlikeBlog();
+  
+  // Auth hooks
+  const { user, isAuthenticated, logout } = useAuth();
 
   const blogs = Array.isArray(blogsResponse?.data?.items) ? blogsResponse.data.items : []
 
@@ -106,6 +115,11 @@ const Blog = () => {
   };
 
   const handleLike = async (blog: BlogPost) => {
+    if (!isAuthenticated) {
+      setShowLoginDialog(true);
+      return;
+    }
+
     try {
       if (blog.isLiked) {
         await unlikeBlogMutation.mutateAsync(blog.id);
@@ -198,16 +212,67 @@ const Blog = () => {
           )}
         </div>
 
-        {/* Write Blog Button */}
-        <div className="flex justify-end mb-8">
+        {/* Auth Status and Write Blog Button */}
+        <div className="flex justify-between items-center mb-8">
+          {isAuthenticated && user ? (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <User className="w-4 h-4" />
+              <span>Chào {user.name}</span>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={logout}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <LogOut className="w-4 h-4 mr-1" />
+                Đăng xuất
+              </Button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setShowLoginDialog(true)}
+                className="border-primary/20"
+              >
+                <LogIn className="w-4 h-4 mr-2" />
+                Đăng nhập
+              </Button>
+            </div>
+          )}
+
           <Button 
-            onClick={() => setIsWriting(!isWriting)}
+            onClick={() => {
+              if (!isAuthenticated) {
+                setShowLoginDialog(true);
+                return;
+              }
+              setIsWriting(!isWriting);
+            }}
             className="bg-gradient-primary text-white"
           >
             <PlusCircle className="w-4 h-4 mr-2" />
             {isWriting ? "Hủy" : "Viết Blog"}
           </Button>
         </div>
+
+        {/* Authentication Alert */}
+        {!isAuthenticated && (
+          <Alert className="mb-8 border-amber-200 bg-amber-50">
+            <LogIn className="h-4 w-4" />
+            <AlertDescription>
+              Bạn cần đăng nhập để tạo blog, thích và bình luận. 
+              <Button 
+                variant="link" 
+                className="p-0 h-auto ml-1 text-amber-700 underline"
+                onClick={() => setShowLoginDialog(true)}
+              >
+                Đăng nhập ngay
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
 
         {/* Write Blog Form */}
         {isWriting && (
@@ -467,6 +532,12 @@ const Blog = () => {
       </main>
 
       <Footer />
+
+      {/* Login Dialog */}
+      <LoginDialog 
+        open={showLoginDialog} 
+        onOpenChange={setShowLoginDialog} 
+      />
 
       {/* Blog Detail Dialog */}
       <Dialog open={!!selectedBlog} onOpenChange={() => setSelectedBlog(null)}>
